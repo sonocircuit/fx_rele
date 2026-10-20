@@ -1,4 +1,4 @@
-local fx = require("fx/lib/fx")
+local fx = require 'fx/lib/fx'
 local md = require 'core/mods'
 
 local FxRele = fx:new{subpath = "/fx_rele"}
@@ -11,9 +11,12 @@ del.rate_r = 1/4
 del.rate_names = {"1/16", "1/12", "3/32", "1/8", "1/6", "3/16", "1/4","1/3", "3/8", "1/2", "2/3", "3/4", "1"}
 del.rate_values = {1/16, 1/12, 3/32, 1/8, 1/6, 3/16, 1/4, 1/3, 3/8, 1/2, 2/3, 3/4, 1}
 
--- display utilities
-local function round_form(param, quant, form)
-  return(util.round(param, quant)..form)
+local prms = {"level", "type", "mode", "time_l", "time_r", "rate_l", "rate_r", "time", "rate", "feedback", "lpf_cutoff", "hpf_cutoff", "modulation"}
+
+local function bang_params()
+  for _, p in ipairs(prms) do
+    params:lookup_param(p):bang()
+  end
 end
 
 local function update_delay_params()
@@ -49,16 +52,6 @@ local function update_delay_params()
   _menu.rebuild_params()
 end
 
-local function pan_display(param)
-  if param < -0.01 then
-    return ("L < "..math.abs(util.round(param * 100, 1)))
-  elseif param > 0.01 then
-    return (math.abs(util.round(param * 100, 1)).." > R")
-  else
-    return "> <"
-  end
-end
-
 local function set_rates()
   if del.sync then
     local beat_sec = clock.get_beat_sec()
@@ -71,9 +64,13 @@ local function set_fx_param(key, val)
   osc.send({ "localhost", 57120 }, "/fx_rele/set", {key, val})
 end
 
-function FxDelnsh:add_params()
+local function round_form(param, quant, form)
+  return(util.round(param, quant)..form)
+end
+
+function FxRele:add_params()
   params:add_group("fx_rele", "fx rEle", 15)
-  FxDelnsh:add_slot("fx_rele_slot", "slot")
+  FxRele:add_slot("fx_rele_slot", "slot")
 
   params:add_control("fx_rele_level", "level", controlspec.new(0, 1, "lin", 0, 1), function(param) return round_form(param:get() * 100, 1, "%") end)
   params:set_action("fx_rele_level", function(x) set_fx_param("amp", x) end)
@@ -114,13 +111,9 @@ function FxDelnsh:add_params()
   params:add_control("fx_rele_modulation", "mod depth", controlspec.new(0, 1, "lin", 0, 0), function(param) return round_form(param:get() * 100, 1, "%") end)
   params:set_action("fx_rele_modulation", function(x) set_fx_param("mod", x) end)
 
-  update_delay_params()
+  bang_params()
 end  
 
-local function add_fx()
-  FxRele:add_params()
-end
-
-md.hook.register("script_post_init", "fx rEle post init", add_fx)
+md.hook.register("script_post_init", "fx rEle post init", function() FxRele:add_params() end)
 
 return FxRele
