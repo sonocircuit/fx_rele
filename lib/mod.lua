@@ -111,7 +111,7 @@ function FxRele:add_params()
   params:add_control("fx_rele_modulation", "mod depth", controlspec.new(0, 1, "lin", 0, 0), function(param) return round_form(param:get() * 100, 1, "%") end)
   params:set_action("fx_rele_modulation", function(x) set_fx_param("mod", x) end)
 
-  bang_params()
+  --bang_params()
 end  
 
 md.hook.register("script_post_init", "fx rEle post init", function() FxRele:add_params() end)
