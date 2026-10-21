@@ -7,4 +7,4 @@ _passing chunks down the line_
 - time is either set manually or clocked to musical time divisions
 - modulate time with low frequency noise
 - high and lowpass filter in the feedback loop
-- 4seconds max delay time
+- 2s max delay time
