@@ -1,3 +1,6 @@
+-- rEle - a multimode delay for fx mod
+-- v1.0 @sonoCircuit
+
 local fx = require 'fx/lib/fx'
 local md = require 'core/mods'
 
@@ -14,9 +17,12 @@ del.rate_values = {1/16, 1/12, 3/32, 1/8, 1/6, 3/16, 1/4, 1/3, 3/8, 1/2, 2/3, 3/
 local prms = {"level", "type", "mode", "time_l", "time_r", "rate_l", "rate_r", "time", "rate", "feedback", "lpf_cutoff", "hpf_cutoff", "modulation"}
 
 local function bang_params()
-  for _, p in ipairs(prms) do
-    params:lookup_param(p):bang()
-  end
+  clock.run(function()
+    clock.sleep(1)
+    for _, p in ipairs(prms) do
+      params:lookup_param(p):bang()
+    end
+  end)
 end
 
 local function update_delay_params()
@@ -111,9 +117,7 @@ function FxRele:add_params()
   params:add_control("fx_rele_modulation", "mod depth", controlspec.new(0, 1, "lin", 0, 0), function(param) return round_form(param:get() * 100, 1, "%") end)
   params:set_action("fx_rele_modulation", function(x) set_fx_param("mod", x) end)
 
-  --bang_params()
+  bang_params()
 end  
 
 md.hook.register("script_post_init", "fx rEle post init", function() FxRele:add_params() end)
-
-return FxRele
