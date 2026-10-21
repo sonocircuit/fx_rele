@@ -28,7 +28,7 @@ FxRele : FxBase {
 	
 	addSynthdefs {
 		SynthDef.new(\fxRele, { |inBus, outBus|	
-			var modHz = 12, tMax = 4, modF = 0.008;
+			var modHz = 12, tMax = 2, modF = 0.008;
 			
 			var modT = modF * \mod.kr(0);
 			var modOsc = LFNoise2.ar(modHz);
